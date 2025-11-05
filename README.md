@@ -1,5 +1,4 @@
-// Need Arduino board, LEDs, Motors, Motor Driver (I used L293D), PIR, and buzzer
-// Ideally, this would play an MP3 sound effect, but I didn’t have the module at the time
+// Need Arduino board, LEDs, Motors, Motor Driver (I used L293D), PIR, and buzzer. Ideally, this would play an MP3 sound effect, but I didn’t have the module at the time.
 
 ![CreepyDoll](https://github.com/user-attachments/assets/c54f4283-92db-4e85-a0a1-6db88f84bac6)
 
