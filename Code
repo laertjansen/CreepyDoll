@@ -1,0 +1,113 @@
+// Motion-activated dual motor wiggle + LED flash
+// Need Arduino board, LEDs, Motors, Motor Driver (I used L293D), PIR, and buzzer
+
+#define pinForwardsMotorA 5
+#define pinBackwardsMotorA 6
+#define pinForwardsMotorB 9
+#define pinBackwardsMotorB 10
+
+#define speed 190        
+#define speed2 140       
+#define wiggleTime 1500   
+#define wiggleCount 4    
+
+int pirPin = 3;
+int motionStatus = 0;
+int pirState = 0;
+
+#define LED1 7
+#define LED2 8
+#define BUZZER_PIN 2
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(pirPin, INPUT);
+  delay(100);
+
+  pinMode(pinForwardsMotorA, OUTPUT);
+  pinMode(pinBackwardsMotorA, OUTPUT);
+  pinMode(pinForwardsMotorB, OUTPUT);
+  pinMode(pinBackwardsMotorB, OUTPUT);
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+
+  stopMotors();
+  digitalWrite(LED1, LOW);
+  digitalWrite(LED2, LOW);
+}
+
+void loop() {
+  motionStatus = digitalRead(pirPin);
+
+  if (motionStatus == HIGH && pirState == LOW) {
+    Serial.println("Motion detected");
+    pirState = HIGH;
+
+    // Motors, LEDs, and laugh together
+    for (int i = 0; i < wiggleCount; i++) {
+      runMotorsForward();
+      laughAndFlash(wiggleTime);
+
+      runMotorsBackward();
+      laughAndFlash(wiggleTime);
+    }
+
+    stopMotors();
+    noTone(BUZZER_PIN);
+  }
+
+  else if (motionStatus == LOW && pirState == HIGH) {
+    Serial.println("Motion Ended");
+    pirState = LOW;
+    stopMotors();
+    noTone(BUZZER_PIN);
+  }
+
+  delay(50);
+}
+
+// Motor functions
+void runMotorsForward() {
+  analogWrite(pinForwardsMotorA, speed);
+  analogWrite(pinBackwardsMotorA, LOW);
+  //analogWrite(pinForwardsMotorB, speed2);
+  //analogWrite(pinBackwardsMotorB, LOW);
+}
+
+void runMotorsBackward() {
+  analogWrite(pinForwardsMotorA, LOW);
+  analogWrite(pinBackwardsMotorA, speed);
+  //analogWrite(pinForwardsMotorB, LOW);
+  //analogWrite(pinBackwardsMotorB, speed2);
+}
+
+void stopMotors() {
+  analogWrite(pinForwardsMotorA, LOW);
+  analogWrite(pinBackwardsMotorA, LOW);
+  //analogWrite(pinForwardsMotorB, LOW);
+  //analogWrite(pinBackwardsMotorB, LOW);
+}
+
+// Buzzer + LED flicker 
+void laughAndFlash(int durationMs) {
+  unsigned long start = millis();
+  while (millis() - start < durationMs) {
+    int pitch = random(300, 800);  
+    tone(BUZZER_PIN, pitch);
+    
+    digitalWrite(LED1, HIGH);
+    digitalWrite(LED2, LOW);
+    delay(random(60, 120));
+
+    digitalWrite(LED1, LOW);
+    digitalWrite(LED2, HIGH);
+    delay(random(60, 120));
+
+    noTone(BUZZER_PIN);
+    delay(random(30, 70)); 
+  }
+  noTone(BUZZER_PIN);
+  digitalWrite(LED1, LOW);
+  digitalWrite(LED2, LOW);
+}
